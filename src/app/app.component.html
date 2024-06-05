@@ -1,8 +1,5 @@
-<!-- <router-outlet /> -->
-<div class="flex items-center gap-2 flex-col justify-center w-full h-full">
-  <p-button label="Click me" (onClick)="onButtonClicked()" />
-  @if(clicks() > 0) {
-  <p class="text-center">Click Count: {{ clicks() }}</p>
-  }
-</div>
- 
+<app-top-nav />
+<main class="w-full h-full">
+    <router-outlet />
+</main>
+<p-toast />
