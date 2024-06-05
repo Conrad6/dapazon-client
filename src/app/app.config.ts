@@ -4,6 +4,7 @@ import { provideRouter, withViewTransitions } from '@angular/router';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 
 import { routes } from './app.routes';
 import { DappazonState } from './state/dapp.state';
@@ -18,6 +19,9 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom([
       NgxsModule.forRoot([DappazonState]),
       NgxsStoragePluginModule.forRoot(),
+      NgxsLoggerPluginModule.forRoot({
+        disabled: !isDevMode()
+      }),
       NgxsReduxDevtoolsPluginModule.forRoot({
         disabled: !isDevMode()
       })

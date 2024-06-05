@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { BrowserProvider, Contract, Eip1193Provider } from 'ethers';
+import { BigNumberish, BrowserProvider, Contract, Eip1193Provider } from 'ethers';
 import { Dappazon, DappazonNamespace } from '../../models';
 import { AccountsChanged } from '../actions';
 import abis from '../assets/abis.json';
@@ -16,21 +16,54 @@ export class DappService {
   constructor(private store: Store) {
   }
 
+  async doBuyProduct(itemId: BigNumberish, itemCost: BigNumberish) {
+    await this.assertProvider();
+    const signer = await this.provider?.getSigner();
+    const transaction = await this.dappazonInstance?.connect(signer).buy(itemId, { value: itemCost });
+    await transaction?.wait();
+  }
+
+  async findCustomerOrder(itemId: BigNumberish) {
+    await this.assertProvider();
+
+    const account = await this.provider?.getSigner().then(signer => signer.getAddress());
+    const events = await this.dappazonInstance?.queryFilter(this.dappazonInstance.filters.Buy);
+    const orders = events?.filter(event => event.args.buyer == account && event.args.itemId.toString() == itemId);
+
+    if (!orders) return [];
+
+    return await Promise.all(orders.map(event => this.dappazonInstance!.orders(String(account), event.args.orderId).then(order => {
+      return {
+        item: {
+          category: order.item.category,
+          cost: order.item.cost.toString(),
+          id: order.item.id.toString(),
+          rating: order.item.rating.toString(),
+          image: order.item.image,
+          name: order.item.name,
+          stock: order.item.stock.toString(),
+        },
+        time: ((order.time as bigint) * 1000n).toString()
+      } as { time: BigNumberish, item: DappazonNamespace.ItemStruct };
+    })));
+
+  }
+
   async getStoreListings() {
-    this.assertProvider();
+    await this.assertProvider();
 
     const items: DappazonNamespace.ItemStruct[] = [];
     for (let i = 0; i < 9; i++) {
       const item = await this.dappazonInstance?.items(i + 1);
       if (!item) continue;
       items.push({
-        id: item[0],
-        name: item[1],
-        category: item[2],
-        image: item[3],
-        cost: item[4],
-        rating: item[5],
-        stock: item[6]
+        id: item.id.toString(),
+        name: item.name,
+        category: item.category,
+        image: item.image,
+        cost: item.cost.toString(),
+        rating: item.rating.toString(),
+        stock: item.stock.toString()
       } as DappazonNamespace.ItemStruct);
     }
 

@@ -1,0 +1,60 @@
+<div class="flex items-start">
+    <p-image imageClass="rounded-md" previewImageSizes="500" appendTo="body" [preview]="true" [src]="item().image" />
+</div>
+<div class="space-y-3 w-full h-full">
+    <h2>{{ item().name }}</h2>
+    <div>
+        <p-rating [ngModel]="item().rating" [readonly]="true" [cancel]="false" />
+    </div>
+    <p-divider />
+    <h3 class="">{{ item().cost | eth }}</h3>
+    <p-divider />
+    <h2>Overview</h2>
+
+    <p class="text-slate-500 line-clamp-[8] text-ellipsis">Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+        Laudantium neque, sapiente blanditiis labore ipsum veniam, quo eum, dolorem non assumenda rem. Itaque eius
+        consequuntur necessitatibus deserunt repellat non, commodi ipsam blanditiis fugit, harum, dolorum vel est
+        doloremque sint officiis nostrum numquam magnam cumque omnis! Architecto, omnis a quasi illum iste facilis
+        commodi libero eaque nobis nesciunt sed esse dolores voluptate.</p>
+</div>
+<div
+    class="border h-full border-gray-500 border-solid min-w-[300px] p-3 space-y-3 bg-[var(--surface-100)] rounded-md overflow-y-auto">
+    <h3>{{ item().cost | eth }}</h3>
+    <p>FREE delivery <br /> <strong>
+            {{ deliveryDate | date:'MMM dd yyy' }}
+        </strong>
+    </p>
+
+    <div>
+        <p-tag [value]="parseUnits(item().stock) > 0 ? 'In Stock' : 'Out of Stock'"
+            [severity]="parseUnits(item().stock) > 0 ? 'success' : 'danger'" />
+    </div>
+
+    <div>
+        <p-button [disabled]="buying() || parseUnits(item().stock) <= 0" [loading]="buying()"
+            loadingIcon="pi pi-spinner pi-spin" label="Buy Now" (onClick)="onBuyButtonClicked()" size="small" />
+    </div>
+    <p><small>Ships from</small> <strong> Dappazon</strong></p>
+    <p><small>Sold by</small> <strong> Dappazon</strong></p>
+    <p-divider />
+    <p class="font-semibold m-0">My Orders</p>
+    @defer(when !loadingDetails()) {
+    @if(orders().length > 0) {
+    <div class="space-y-2 max-h-[250px]">
+        @for(order of orders();track order.time) {
+        <div class="border border-solid bg-[var(--surface-100)] border-slate-600 space-y-2 p-2">
+            <p>Item bought on <br /><strong>{{ $any(order.time) | date:'MMM dd yyy - hh:mm a' }}</strong></p>
+        </div>
+        }
+    </div>
+    } @else {
+    <p class="text-sm m-0">No orders recorded</p>
+    }
+    }@placeholder(minimum 2.5s) {
+    @for(x of [1,2];track $index) {
+    <div>
+        <p-skeleton height="25px" width="100%" />
+    </div>
+    }
+    }
+</div>

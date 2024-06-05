@@ -1,3 +1,58 @@
 <div class="container mx-auto">
-    <h2>Dappazon Best Sellers</h2>
+    <h2 class="text-slate-600">Dappazon Best Sellers</h2>
+    <p-divider />
+    @defer (when !loadingStoreItems() && storeItems()) {
+    <div class="space-y-3">
+        @for(group of storeItems();track group.key){
+        <h3 class="text-lg text-slate-500">{{ group.groupName }}</h3>
+        <p-divider />
+        <div class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(auto,185.41px))] w-full auto-rows-auto gap-3">
+            @for(item of group.items;track item.id) {
+            <p-card styleClass="h-full w-full overflow-hidden">
+                <ng-template pTemplate="header">
+                    <img [src]="item.image" />
+                </ng-template>
+                <div class="flex gap-3 items-center h-full">
+                    <div class="flex gap-2 items-center">
+                        <p-button (onClick)="onPreviewItemButtonClicked(item)" [raised]="true" icon="pi pi-eye"
+                            size="small" />
+                    </div>
+                    <div class="space-y-2">
+                        <p>{{item.name}}</p>
+                        <p class="font-semibold">{{ item.cost | eth }}</p>
+                        <div>
+                            <p-rating [ngModel]="item.rating" [readonly]="true" [cancel]="false" />
+                        </div>
+                    </div>
+                </div>
+            </p-card>
+            }
+        </div>
+        }
+    </div>
+    }@placeholder {
+    <div class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(auto,185.41px))] w-full auto-rows-[300px] gap-3">
+        @for (i of [1,2,3,4,5,6,7,8,9]; track $index) {
+        <div class="inline-grid gap-y-1 grid-rows-[80%,20%]">
+            <p-skeleton width="100%" height="100%" />
+            <div class="flex gap-2 items-center">
+                <p-skeleton width="35px" height="35px" />
+                <div class="flex flex-col gap-1">
+                    <p-skeleton width="80px" height="12px" />
+                    <p-skeleton width="90px" height="12px" />
+                    <p-skeleton width="20px" height="12px" />
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
 </div>
+<p-dialog [closable]="previewDialogDismissable() ?? false" [resizable]="false"
+    [dismissableMask]="previewDialogDismissable() ?? false" [closeOnEscape]="previewDialogDismissable() ?? false"
+    (onHide)="onPreviewDialogClose()" [style]="{ width: '75vw' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    header="Item Details" [draggable]="false" [(visible)]="showPreviewDialog" [modal]="true">
+    @if(previewTarget()){
+    <app-item-details [item]="$any(previewTarget())" />
+    }
+</p-dialog>

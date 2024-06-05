@@ -19,6 +19,7 @@
     "@angular/platform-browser-dynamic": "^18.0.0",
     "@angular/router": "^18.0.0",
     "@ngxs/devtools-plugin": "^3.8.2",
+    "@ngxs/logger-plugin": "^3.8.2",
     "@ngxs/storage-plugin": "^3.8.2",
     "@ngxs/store": "^3.8.2",
     "ethers": "^6.13.0",
